@@ -6,7 +6,6 @@ const sleep = promisify(setTimeout);
 
 
 
-main();
 
 function parse_socket(msg){
     data = msg.data
