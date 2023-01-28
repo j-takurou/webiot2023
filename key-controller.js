@@ -8,6 +8,15 @@ const sleep = promisify(setTimeout);
 
 
 function parse_socket(msg){
+    /* 
+        server / 人感センサーから受信結果をパースする
+        Args:
+        Return: 
+            status: optional TODO:不要かも？
+            command: モーターへの処理内容（施錠・解錠のいずれか）
+                ["lock", "unlock"]の値が格納されている
+            direction: お家の鍵の施錠方向が時計回りかどうかを制御する
+    */
     data = msg.data
     status = data["status"]
     command = data["command"]
