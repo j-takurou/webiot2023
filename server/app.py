@@ -110,13 +110,16 @@ def rotate():
 
 @app.route('/send_existence', methods=["GET", "POST"])
 def send_existence():
-    # import pdb;pdb.set_trace()
-    print("arrived")
-    data = request.get_data()
+    """ 
+    sema-sense(人感センサ)から送られてくる在不在情報を捌くAPI 
+    Method: GET
+    """
+    data = json.loads(request.get_data().decode())
     is_here = data["is_here"]
 
-    query = f" UPDATE sema_sense SET is_here={is_here} WHERE device_id = 1"
+    query = f"UPDATE sema_sense SET is_here={is_here} WHERE device_id = 1"
     con.execute(query)
+    con.commit()
 
     return jsonify({'message': 'successfully sent existence data'}), 200
 
@@ -146,6 +149,6 @@ if __name__ == '__main__':
     
     init_db(con)
     app.debug = True
-    app.run(host='127.0.0.1', port=8888)
+    app.run(host='0.0.0.0', port=8000)
 
     # server側: 192.168.128.106
