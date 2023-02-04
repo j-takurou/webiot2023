@@ -46,13 +46,13 @@ if __name__ == '__main__':
     Servo = SG90_92R_Class(Pin=4,ZeroOffsetDuty=0)
     try:
         while True:
-            Servo.SetPos(45)
+            Servo.SetPos(0)
             time.sleep(1)
-            Servo.SetPos(135)
+            Servo.SetPos(90)
             time.sleep(1)
-            Servo.SetPos(45)
+            Servo.SetPos(180)
             time.sleep(1)
-            Servo.SetPos(135)
+            Servo.SetPos(90)
             time.sleep(1)
     except KeyboardInterrupt  :         #Ctl+Cが押されたらループを終了
         Servo.SetPos(0)
