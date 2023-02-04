@@ -34,7 +34,7 @@ class SG90_92R_Class:
     """終了処理"""
     def Cleanup(self):
         #サーボを10degにセットしてから、インプットモードにしておく
-        self.SetPos(90)
+        self.SetPos(0)
         time.sleep(1)
         GPIO.setup(self.mPin, GPIO.IN)
 
