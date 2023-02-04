@@ -95,13 +95,12 @@ def receive_sound():
         r.set("mic", sound, ex=10)
 
 
-@app.route("/speaker-polling/")
+@app.route("/mic-state/")
 def check_sound():
     import redis
     r = redis.Redis(host='localhost', port=6379, db=0)
-    sound = r.get("mic")
-    sound_type = sound.decode() if sound is not None else "none"
-    return json.dumps({"sound_type": sound_type})
+    with_sound = r.get("mic")
+    return str(with_sound)
 
 if __name__ == '__main__':
     
