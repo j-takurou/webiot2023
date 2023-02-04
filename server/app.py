@@ -100,7 +100,7 @@ def check_sound():
     import redis
     r = redis.Redis(host='localhost', port=6379, db=0)
     with_sound = r.get("mic")
-    return str(with_sound)
+    return str(with_sound) if with_sound else "0"
 
 if __name__ == '__main__':
     
