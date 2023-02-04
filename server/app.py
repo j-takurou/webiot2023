@@ -78,6 +78,30 @@ def exist_restroom():
     return json.dumps({"is_here": is_here})
 
 
+@app.route("/send_sound/", method=["POST"])
+def receive_sound():
+    """ 
+    mic to server
+    POC demoでは、micから取れるサウンドデータが、何に関するサウンドかの情報を送信する
+    - サウンドが送信されたタイミングでcacheする
+    - 10秒でexpireするように設定する。
+    """
+    import redis
+    if request.method == "POST":
+        r = redis.Redis(host='localhost', port=6379, db=0)
+        # extract sound info
+        data = json.loads(request.get_data().decode())
+        sound = data["collect-sound"]
+        r.set("mic", sound, ex=10)
+
+
+@app.route("/speaker-polling/")
+def check_sound():
+    import redis
+    r = redis.Redis(host='localhost', port=6379, db=0)
+    sound = r.get("mic")
+    sound_type = sound.decode() if sound is not None else "none"
+    return json.dumps({"sound_type": sound_type})
 
 if __name__ == '__main__':
     
