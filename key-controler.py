@@ -1,36 +1,41 @@
-from flask import Flask
-from flask import request
-from .sg90_sg92 import SG90_92R_Class
-import RPi.GPIO as GPIO
-GPIO.setmode(GPIO.BCM)
-app = Flask(__name__)
+# 
+import urllib.request
+import json
+try:
+    from sg90_sg92 import SG90_92R_Class
+    import RPi.GPIO as GPIO
+    GPIO.setmode(GPIO.BCM)
+except ModuleNotFoundError:
+    pass
+import time
 
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
+def main():
+    """
+    - serverへのpollingを行う 1 request/5 sec
+    - 在である(is_here == 1)ならば、施錠する
+        - Notice: 解錠時はpositionが0になるように調整しておく
+        - ちょうど90度プロペラを回転させて施錠する
+    - 不在(is_here == 0)になったら、解錠する
+    """
+    try:
+        servo = SG90_92R_Class(Pin=4,ZeroOffsetDuty=0)
+        servo.SetPos(0)
+        while True:
+            with urllib.request.urlopen('http://sema-srv.local:8000/key-polling/') as response:
+                data = json.loads(response.read().decode())
+                print(data)
+                if data["is_here"] == 1:
+                    # 施錠
+                    servo.SetPos(90)
+                else:
+                    # 解錠
+                    servo.SetPos(0)
+            time.sleep(5)
+    except KeyboardInterrupt:
+        servo.Cleanup()
+        GPIO.cleanup()
 
+        
 
-@app.route("/rotate/")
-def rotate():
-    if request.method == "POST":
-        data = request.get_data()
-        status = data["status"] # close or open
-        command = data["command"] # lock or unlock
-        direction = data["direction"]
-        Servo = SG90_92R_Class(Pin=4,ZeroOffsetDuty=0)
-        # 回転方向を保証できるかどうかが怖い
-        Servo.SetPos(45)
-    return "<p>rotate!</p>"
-
-
-@app.route("/key-polling/")
-def exist_restroom():
-    if request.method == "GET":
-        data = request.get_data()
-        status = data["status"] # close or open
-        command = data["command"] # lock or unlock
-        direction = data["direction"]
-        Servo = SG90_92R_Class(Pin=4,ZeroOffsetDuty=0)
-        # 回転方向を保証できるかどうかが怖い
-        Servo.SetPos(45)
-    return "<p>rotate!</p>"
+if __name__ == "__main__":
+    main()
